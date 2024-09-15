@@ -8,7 +8,6 @@ import frc.robot.Constants;
 import frc.robot.commands.RunMotor;
 import frc.robot.commands.StopMotor;
 import frc.robot.subsystems.Motor;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,16 +22,11 @@ public class RobotContainer {
   CommandXboxController xboxController; 
   public Motor motor;
 
-  // DigitalInput proxSensor;
-  //   Trigger isTripped;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     motor = new Motor();
-    xboxController = new CommandXboxController(0);
-    
-    // proxSensor = new DigitalInput(4);
-    // isTripped = new Trigger(proxSensor::get);
+    xboxController = new CommandXboxController(Constants.xboxConstants.xboxControllerPort);
+   
     // Configure the trigger bindings
     configureBindings();
   }
@@ -47,29 +41,24 @@ public class RobotContainer {
    * joysticks}.
    */
   public void configureBindings() {
-
-  //xboxController.a().whileTrue(Commands.run(()->motor.useEncoder()));
   
-
    xboxController.b().whileTrue(new RunMotor(motor)).onFalse(new StopMotor(motor));
 
-   //motor.isTripped.onFalse(Commands.runOnce(()->motor.setMotorSpeed(0),motor));
-
    //xboxController.b().whileTrue(motor.runMotorWhenTrippedCommand());
-
-   xboxController.leftTrigger().onTrue(Commands.run(()->motor.setmotorRevolutions(10),motor))
-   .onFalse(Commands.run(()->motor.stopMotor(), motor));
 
     //With Joystick
    xboxController.x().onTrue(Commands.run(()->motor.setMotorSpeed(xboxController.getLeftY()),motor)
    .alongWith(Commands.run(()-> System.out.println(xboxController.getLeftY()))))
    .onFalse(Commands.run(()->motor.stopMotor(), motor));
   
-    xboxController.rightTrigger().onTrue(Commands.run(()->motor.setWristAngle(),motor)).onFalse(
-      Commands.run(()->motor.setMotorSpeed(0), motor)
-    );
+    xboxController.rightTrigger().onTrue(Commands.run(()->motor.setWristAngle(180.0),motor)).onFalse(
+      Commands.run(()->motor.setMotorSpeed(0), motor));
 
-   //xboxController.a().onTrue(Commands.run(()->motor.motor.set(0), motor));
+    xboxController.leftTrigger().onTrue(Commands.run(()->motor.setmotorRevolutions(0),motor))
+   .onFalse(Commands.run(()->motor.stopMotor(), motor));
+
+   motor.isTripped.whileFalse(Commands.runOnce(()->motor.setMotorSpeed(0),motor));
+
   }
 
   /**
